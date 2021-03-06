@@ -12,7 +12,7 @@ plugins {
    id 'application'
 }
 
-application.mainClassName 'main.java.net.MPServer.java'
+application.mainClassName 'net.MPServer'
 
 repositories {
     // Use jcenter for resolving dependencies.
