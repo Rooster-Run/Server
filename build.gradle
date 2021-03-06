@@ -23,7 +23,7 @@ repositories {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'net.MPServer.java'
+                'Main-Class': 'net.MPServer'
         )
     }
     from {
