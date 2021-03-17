@@ -7,6 +7,9 @@ import net.packet.CreateGameSession;
 import net.packet.JoinGameSession;
 import net.packet.Login;
 import net.packet.Movement;
+import net.packet.PlayerPosition;
+import net.packet.SessionInfo;
+import net.packet.StartGame;
 
 public class Network {
 
@@ -19,6 +22,10 @@ public class Network {
 		kryo.register(CreateGameSession.class);
 		kryo.register(JoinGameSession.class);
 		kryo.register(Movement.class);
+		kryo.register(SessionInfo.class);
+		kryo.register(java.util.ArrayList.class);
+		kryo.register(StartGame.class);
+		kryo.register(PlayerPosition.class);
 	}
 	
 }
