@@ -4,9 +4,14 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
 
 import net.packet.CreateGameSession;
+import net.packet.ErrorPacket;
 import net.packet.JoinGameSession;
 import net.packet.Login;
 import net.packet.Movement;
+import net.packet.PlayerInfo;
+import net.packet.SessionInfo;
+import net.packet.StartGame;
+import net.packet.TerminateSession;
 
 public class Network {
 
@@ -19,6 +24,12 @@ public class Network {
 		kryo.register(CreateGameSession.class);
 		kryo.register(JoinGameSession.class);
 		kryo.register(Movement.class);
+		kryo.register(SessionInfo.class);
+		kryo.register(java.util.ArrayList.class);
+		kryo.register(StartGame.class);
+		kryo.register(PlayerInfo.class);
+		kryo.register(ErrorPacket.class);
+		kryo.register(TerminateSession.class);
 	}
 	
 }
