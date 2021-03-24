@@ -6,20 +6,17 @@ import java.util.Random;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-
-
 import net.packet.CreateGameSession;
-import net.packet.ErrorPacket;
 import net.packet.JoinGameSession;
 import net.packet.Login;
 import net.packet.PlayerInfo;
 import net.packet.SessionInfo;
 import net.packet.StartGame;
 import net.packet.TerminateSession;
+import net.packet.Winner;
 
 public class MPServer {
 
-//	private MainGame game;
 	private final static int TOKEN_LENGTH = 5;
 	public Server server;
 	public HashMap<String, GameSession> sessions;
@@ -53,13 +50,11 @@ public class MPServer {
 
 				if (object instanceof TerminateSession) {
 					TerminateSession packet = (TerminateSession) object;
-					System.out.println(sessions.toString());
 					sessions.get(packet.token).getPlayerByID(connection.getID()).playing = false;
 
 					if (isDeleteable(packet)) {
 						sessions.remove(packet.token);
 					}
-					System.out.println(sessions.toString());
 
 				}
 
@@ -103,6 +98,7 @@ public class MPServer {
 							server.sendToTCP(connectionID, packet);
 						}
 					}
+					System.out.println(sessions.get(packet.token));
 				}
 
 				if (object instanceof PlayerInfo) {
@@ -112,6 +108,29 @@ public class MPServer {
 						for (Integer connectionID : session.getPlayerIDs()) {
 							server.sendToTCP(connectionID, packet);
 						}
+					}
+				}
+				if (object instanceof Winner) {
+					Winner packet = (Winner) object;
+					System.out.println(1);
+
+					if (sessions.get(packet.token) != null) {
+						GameSession session = sessions.get(packet.token);
+						String winnerName = "";
+						for (Player p: session.getPlayers()) {
+							if (p.getID()==packet.playerID)
+								winnerName = p.getName();
+						}
+						System.out.println(2 +" " + winnerName);
+
+						
+						if(session.setWinner(winnerName)) {
+							packet.winnerName = winnerName;							 
+							for (Integer connectionID : session.getPlayerIDs()) {
+								server.sendToTCP(connectionID, packet);
+							}
+							System.out.println(3);
+						}						
 					}
 				}
 			}

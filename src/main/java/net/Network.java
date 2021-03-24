@@ -12,6 +12,7 @@ import net.packet.PlayerInfo;
 import net.packet.SessionInfo;
 import net.packet.StartGame;
 import net.packet.TerminateSession;
+import net.packet.Winner;
 
 public class Network {
 
@@ -30,6 +31,7 @@ public class Network {
 		kryo.register(PlayerInfo.class);
 		kryo.register(ErrorPacket.class);
 		kryo.register(TerminateSession.class);
+		kryo.register(Winner.class);
 	}
 	
 }
