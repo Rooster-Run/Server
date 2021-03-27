@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.EndPoint;
 
 import net.packet.CreateGameSession;
 import net.packet.ErrorPacket;
+import net.packet.IceEffect;
 import net.packet.JoinGameSession;
 import net.packet.Login;
 import net.packet.Movement;
@@ -32,6 +33,7 @@ public class Network {
 		kryo.register(ErrorPacket.class);
 		kryo.register(TerminateSession.class);
 		kryo.register(Winner.class);
+		kryo.register(IceEffect.class);
 	}
 	
 }

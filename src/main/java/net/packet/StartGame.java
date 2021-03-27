@@ -2,7 +2,6 @@ package net.packet;
 
 import java.util.ArrayList;
 
-import net.Player;
 
 public class StartGame {
 	public String token;
