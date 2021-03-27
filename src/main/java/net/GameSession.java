@@ -10,7 +10,7 @@ public class GameSession {
 	private String token;
 	private int hostID;
 	private ArrayList<Player> players;
-	private boolean hasStarted;
+	private boolean hasStarted = false;
 	private String mapPath;
 	
 	private String winner;

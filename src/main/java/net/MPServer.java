@@ -53,23 +53,27 @@ public class MPServer {
 
 				if (object instanceof TerminateSession) {
 					TerminateSession packet = (TerminateSession) object;
-					sessions.get(packet.token).getPlayerByID(connection.getID()).playing = false;
-
-					if (isDeleteable(packet)) {
-						sessions.remove(packet.token);
+					GameSession session = sessions.get(packet.token);
+					if (session != null) {
+						session.getPlayerByID(connection.getID()).playing = false;
+	
+						if (isDeleteable(packet)) {
+							sessions.remove(packet.token);
+						}
 					}
-
 				}
 
 				if (object instanceof LeftGameSession) {
 					LeftGameSession packet = (LeftGameSession) object;
 					GameSession session = sessions.get(packet.token);
-					session.removePlayerByID(packet.playerID);
-					
-					if (session.getPlayers().size() <= 0) {
-						sessions.remove(packet.token);
-					} else {						
-						notifyAllPlayers(session);
+					if (session != null) {
+						session.removePlayerByID(packet.playerID);
+						
+						if (session.getPlayers().size() <= 0) {
+							sessions.remove(packet.token);
+						} else {						
+							notifyAllPlayers(session);
+						}
 					}
 				}
 
@@ -91,7 +95,7 @@ public class MPServer {
 					GameSession session = sessions.get(packet.token);
 					
 					// Checking if the token is correct
-					if (sessions == null) {;
+					if (session == null) {;
 						packet.errorToken = true; // token is wrong
 						
 						// Checking if session is in progress
