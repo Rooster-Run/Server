@@ -7,6 +7,7 @@ import net.packet.CreateGameSession;
 import net.packet.ErrorPacket;
 import net.packet.IceEffect;
 import net.packet.JoinGameSession;
+import net.packet.LeftGameSession;
 import net.packet.Login;
 import net.packet.Movement;
 import net.packet.PlayerInfo;
@@ -34,6 +35,7 @@ public class Network {
 		kryo.register(TerminateSession.class);
 		kryo.register(Winner.class);
 		kryo.register(IceEffect.class);
+		kryo.register(LeftGameSession.class);
 	}
 	
 }
