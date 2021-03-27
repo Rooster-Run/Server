@@ -1,6 +1,5 @@
 package net;
 
-
 public class Player {
 
 	private final static int DEFAULT_LIVES = 3;
