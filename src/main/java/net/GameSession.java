@@ -1,6 +1,8 @@
 package net;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class GameSession {
 	
@@ -90,5 +92,13 @@ public class GameSession {
 	
 	public String getWinnerName() {
 		return winner;
+	}
+	
+	public void removePlayerByID(int id) {
+		for (Iterator<Player> iter = players.iterator(); iter.hasNext();) {
+			if(iter.next().getID() == id) {
+				iter.remove();
+			}
+		}
 	}
 }
