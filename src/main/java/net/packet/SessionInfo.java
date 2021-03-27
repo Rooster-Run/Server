@@ -2,8 +2,6 @@ package net.packet;
 
 import java.util.ArrayList;
 
-import net.Player;
-
 public class SessionInfo {
 	public boolean gameOver;
 	public int playerID;

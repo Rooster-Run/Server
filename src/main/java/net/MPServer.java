@@ -6,7 +6,9 @@ import java.util.Random;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+
 import net.packet.CreateGameSession;
+import net.packet.IceEffect;
 import net.packet.JoinGameSession;
 import net.packet.Login;
 import net.packet.PlayerInfo;
@@ -51,7 +53,7 @@ public class MPServer {
 				if (object instanceof TerminateSession) {
 					TerminateSession packet = (TerminateSession) object;
 					sessions.get(packet.token).getPlayerByID(connection.getID()).playing = false;
-
+					
 					if (isDeleteable(packet)) {
 						sessions.remove(packet.token);
 					}
@@ -64,24 +66,28 @@ public class MPServer {
 					packet.token = token;
 					GameSession session = new GameSession(token, packet.mapPath);
 					session.addPlayer(connection.getID(), packet.name);
-					session.setHost(connection.getID());
+					session.setHost(connection.getID()); 
 					sessions.put(token, session);
-
 					server.sendToTCP(connection.getID(), packet);
 					notifyAllPlayers(session);
 				}
 
 				if (object instanceof JoinGameSession) {
-					// get his token and see if exists
+					//Get users token 
 					JoinGameSession packet = (JoinGameSession) object;
-
+					//Checking if the token is correct
 					if (sessions.get(packet.token) == null || !sessions.containsKey(packet.token)) {
 						// ErrorPacket invalidPacket = new ErrorPacket();
 						// invalidPacket.invalidToken = true;
-						packet.errorToken = true;
+						packet.errorToken = true; //token is wrong
+						server.sendToTCP(connection.getID(), packet);
+					//Checking if session is in progress 
+					}else if(sessions.get(packet.token).getHasStarted()) {
+						packet.joinedLate = sessions.get(packet.token).getHasStarted(); //session has started
 						server.sendToTCP(connection.getID(), packet);
 					} else {
 						sessions.get(packet.token).addPlayer(connection.getID(), packet.name);
+						packet.joinedLate = sessions.get(packet.token).getHasStarted(); //session hasn't started
 						notifyAllPlayers(sessions.get(packet.token));
 
 						server.sendToTCP(connection.getID(), packet);
@@ -94,6 +100,7 @@ public class MPServer {
 						GameSession session = sessions.get(packet.token);
 						packet.playerIDs = session.getPlayerIDs();
 						packet.playerNames = session.getPlayerNames();
+						session.setHasStarted(true); //Host has started the session
 						for (Integer connectionID : session.getPlayerIDs()) {
 							server.sendToTCP(connectionID, packet);
 						}
@@ -110,9 +117,9 @@ public class MPServer {
 						}
 					}
 				}
+				
 				if (object instanceof Winner) {
 					Winner packet = (Winner) object;
-					System.out.println(1);
 
 					if (sessions.get(packet.token) != null) {
 						GameSession session = sessions.get(packet.token);
@@ -121,7 +128,6 @@ public class MPServer {
 							if (p.getID()==packet.playerID)
 								winnerName = p.getName();
 						}
-						System.out.println(2 +" " + winnerName);
 
 						
 						if(session.setWinner(winnerName)) {
@@ -129,8 +135,18 @@ public class MPServer {
 							for (Integer connectionID : session.getPlayerIDs()) {
 								server.sendToTCP(connectionID, packet);
 							}
-							System.out.println(3);
 						}						
+					}
+				}
+				
+				if (object instanceof IceEffect) {
+					IceEffect packet = (IceEffect) object;
+					if (sessions.get(packet.token) != null) {
+						GameSession session = sessions.get(packet.token);	 
+						for (Integer connectionID : session.getPlayerIDs()) {
+							if (connectionID != packet.playerID)
+								server.sendToTCP(connectionID, packet);
+						}
 					}
 				}
 			}
