@@ -7,8 +7,16 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
-import net.*;
-import net.packet.*;
+import net.packet.CreateGameSession;
+import net.packet.IceEffect;
+import net.packet.JoinGameSession;
+import net.packet.LeftGameSession;
+import net.packet.Login;
+import net.packet.PlayerInfo;
+import net.packet.SessionInfo;
+import net.packet.StartGame;
+import net.packet.TerminateSession;
+import net.packet.Winner;
 
 public class MPServer {
 
@@ -80,23 +88,26 @@ public class MPServer {
 				if (object instanceof JoinGameSession) {
 					// Get users token
 					JoinGameSession packet = (JoinGameSession) object;
+					GameSession session = sessions.get(packet.token);
+					
 					// Checking if the token is correct
-					if (sessions.get(packet.token) == null || !sessions.containsKey(packet.token)) {
-						// ErrorPacket invalidPacket = new ErrorPacket();
-						// invalidPacket.invalidToken = true;
+					if (sessions == null) {;
 						packet.errorToken = true; // token is wrong
-						server.sendToTCP(connection.getID(), packet);
+						
 						// Checking if session is in progress
-					} else if (sessions.get(packet.token).getHasStarted()) {
-						packet.joinedLate = sessions.get(packet.token).getHasStarted(); // session has started
-						server.sendToTCP(connection.getID(), packet);
+					} else if (session.getHasStarted()) {
+						packet.joinedLate = true; // session has started
+						
+					} else if (session.isFull()){
+						packet.isFull = true;
+						
 					} else {
-						sessions.get(packet.token).addPlayer(connection.getID(), packet.name);
-						packet.joinedLate = sessions.get(packet.token).getHasStarted(); // session hasn't started
-						notifyAllPlayers(sessions.get(packet.token));
-
-						server.sendToTCP(connection.getID(), packet);
+						session.addPlayer(connection.getID(), packet.name);
+						packet.joinedLate = session.getHasStarted(); // session hasn't started
+						notifyAllPlayers(session);
 					}
+					
+					server.sendToTCP(connection.getID(), packet);
 				}
 
 				if (object instanceof StartGame) {
@@ -180,7 +191,7 @@ public class MPServer {
 	private String generateGameToken() {
 		String saltStr;
 		do {
-			String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+			String SALTCHARS = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
 			StringBuilder salt = new StringBuilder();
 			Random rnd = new Random();
 			while (salt.length() < TOKEN_LENGTH) { // length of the random string.
