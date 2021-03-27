@@ -7,16 +7,8 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
-import net.packet.CreateGameSession;
-import net.packet.IceEffect;
-import net.packet.JoinGameSession;
-import net.packet.LeftGameSession;
-import net.packet.Login;
-import net.packet.PlayerInfo;
-import net.packet.SessionInfo;
-import net.packet.StartGame;
-import net.packet.TerminateSession;
-import net.packet.Winner;
+import net.*;
+import net.packet.*;
 
 public class MPServer {
 
