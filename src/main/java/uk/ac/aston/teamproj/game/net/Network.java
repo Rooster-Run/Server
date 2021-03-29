@@ -1,19 +1,18 @@
-package net;
+package uk.ac.aston.teamproj.game.net;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
 
-import net.packet.CreateGameSession;
-import net.packet.IceEffect;
-import net.packet.JoinGameSession;
-import net.packet.LeftGameSession;
-import net.packet.Login;
-import net.packet.Movement;
-import net.packet.PlayerInfo;
-import net.packet.SessionInfo;
-import net.packet.StartGame;
-import net.packet.TerminateSession;
-import net.packet.Winner;
+import uk.ac.aston.teamproj.game.net.packet.CreateGameSession;
+import uk.ac.aston.teamproj.game.net.packet.IceEffect;
+import uk.ac.aston.teamproj.game.net.packet.JoinGameSession;
+import uk.ac.aston.teamproj.game.net.packet.LeftGameSession;
+import uk.ac.aston.teamproj.game.net.packet.Login;
+import uk.ac.aston.teamproj.game.net.packet.PlayerInfo;
+import uk.ac.aston.teamproj.game.net.packet.SessionInfo;
+import uk.ac.aston.teamproj.game.net.packet.StartGame;
+import uk.ac.aston.teamproj.game.net.packet.TerminateSession;
+import uk.ac.aston.teamproj.game.net.packet.Winner;
 
 public class Network {
 
@@ -25,7 +24,6 @@ public class Network {
 		kryo.register(Login.class);
 		kryo.register(CreateGameSession.class);
 		kryo.register(JoinGameSession.class);
-		kryo.register(Movement.class);
 		kryo.register(SessionInfo.class);
 		kryo.register(java.util.ArrayList.class);
 		kryo.register(StartGame.class);

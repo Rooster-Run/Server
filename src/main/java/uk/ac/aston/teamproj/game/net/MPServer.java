@@ -1,4 +1,4 @@
-package net;
+package uk.ac.aston.teamproj.game.net;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -7,16 +7,17 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
-import net.packet.CreateGameSession;
-import net.packet.IceEffect;
-import net.packet.JoinGameSession;
-import net.packet.LeftGameSession;
-import net.packet.Login;
-import net.packet.PlayerInfo;
-import net.packet.SessionInfo;
-import net.packet.StartGame;
-import net.packet.TerminateSession;
-import net.packet.Winner;
+import uk.ac.aston.teamproj.game.net.packet.CreateGameSession;
+import uk.ac.aston.teamproj.game.net.packet.IceEffect;
+import uk.ac.aston.teamproj.game.net.packet.JoinGameSession;
+import uk.ac.aston.teamproj.game.net.packet.LeftGameSession;
+import uk.ac.aston.teamproj.game.net.packet.Login;
+import uk.ac.aston.teamproj.game.net.packet.PlayerInfo;
+import uk.ac.aston.teamproj.game.net.packet.SessionInfo;
+import uk.ac.aston.teamproj.game.net.packet.StartGame;
+import uk.ac.aston.teamproj.game.net.packet.TerminateSession;
+import uk.ac.aston.teamproj.game.net.packet.Winner;
+
 
 public class MPServer {
 
@@ -47,30 +48,30 @@ public class MPServer {
 
 				if (object instanceof Login) {
 					Login packet = (Login) object;
-					packet.id = connection.getID();
+					packet.setID(connection.getID());
 					server.sendToTCP(connection.getID(), packet);
 				}
 
 				if (object instanceof TerminateSession) {
 					TerminateSession packet = (TerminateSession) object;
-					GameSession session = sessions.get(packet.token);
+					GameSession session = sessions.get(packet.getToken());
 					if (session != null) {
 						session.getPlayerByID(connection.getID()).playing = false;
 	
 						if (isDeleteable(packet)) {
-							sessions.remove(packet.token);
+							sessions.remove(packet.getToken());
 						}
 					}
 				}
 
 				if (object instanceof LeftGameSession) {
 					LeftGameSession packet = (LeftGameSession) object;
-					GameSession session = sessions.get(packet.token);
+					GameSession session = sessions.get(packet.getToken());
 					if (session != null) {
-						session.removePlayerByID(packet.playerID);
+						session.removePlayerByID(packet.getPlayerID());
 						
 						if (session.getPlayers().size() <= 0) {
-							sessions.remove(packet.token);
+							sessions.remove(packet.getToken());
 						} else {						
 							notifyAllPlayers(session);
 						}
@@ -80,9 +81,9 @@ public class MPServer {
 				if (object instanceof CreateGameSession) {
 					CreateGameSession packet = (CreateGameSession) object;
 					String token = generateGameToken();
-					packet.token = token;
-					GameSession session = new GameSession(token, packet.mapPath);
-					session.addPlayer(connection.getID(), packet.name);
+					packet.setToken(token);
+					GameSession session = new GameSession(token, packet.getMapPath());
+					session.addPlayer(connection.getID(), packet.getName());
 					session.setHost(connection.getID());
 					sessions.put(token, session);
 					server.sendToTCP(connection.getID(), packet);
@@ -92,22 +93,22 @@ public class MPServer {
 				if (object instanceof JoinGameSession) {
 					// Get users token
 					JoinGameSession packet = (JoinGameSession) object;
-					GameSession session = sessions.get(packet.token);
+					GameSession session = sessions.get(packet.getToken());
 					
 					// Checking if the token is correct
 					if (session == null) {;
-						packet.errorToken = true; // token is wrong
+						packet.setErrorToken(true); // token is wrong
 						
 						// Checking if session is in progress
 					} else if (session.getHasStarted()) {
-						packet.joinedLate = true; // session has started
+						packet.setJoinedLate(true); // session has started
 						
 					} else if (session.isFull()){
-						packet.isFull = true;
+						packet.setFull(true);
 						
 					} else {
-						session.addPlayer(connection.getID(), packet.name);
-						packet.joinedLate = session.getHasStarted(); // session hasn't started
+						session.addPlayer(connection.getID(), packet.getName());
+						packet.setJoinedLate(session.getHasStarted()); // session hasn't started
 						notifyAllPlayers(session);
 					}
 					
@@ -116,22 +117,22 @@ public class MPServer {
 
 				if (object instanceof StartGame) {
 					StartGame packet = (StartGame) object;
-					if (sessions.get(packet.token) != null) {
-						GameSession session = sessions.get(packet.token);
-						packet.playerIDs = session.getPlayerIDs();
-						packet.playerNames = session.getPlayerNames();
+					if (sessions.get(packet.getToken()) != null) {
+						GameSession session = sessions.get(packet.getToken());
+						packet.setPlayerIDs(session.getPlayerIDs());
+						packet.setPlayerNames(session.getPlayerNames());
 						session.setHasStarted(true); // Host has started the session
 						for (Integer connectionID : session.getPlayerIDs()) {
 							server.sendToTCP(connectionID, packet);
 						}
 					}
-					System.out.println(sessions.get(packet.token));
+					System.out.println(sessions.get(packet.getToken()));
 				}
 
 				if (object instanceof PlayerInfo) {
 					PlayerInfo packet = (PlayerInfo) object;
-					if (sessions.get(packet.token) != null) {
-						GameSession session = sessions.get(packet.token);
+					if (sessions.get(packet.getToken()) != null) {
+						GameSession session = sessions.get(packet.getToken());
 						for (Integer connectionID : session.getPlayerIDs()) {
 							server.sendToTCP(connectionID, packet);
 						}
@@ -141,16 +142,16 @@ public class MPServer {
 				if (object instanceof Winner) {
 					Winner packet = (Winner) object;
 
-					if (sessions.get(packet.token) != null) {
-						GameSession session = sessions.get(packet.token);
+					if (sessions.get(packet.getToken()) != null) {
+						GameSession session = sessions.get(packet.getToken());
 						String winnerName = "";
 						for (Player p : session.getPlayers()) {
-							if (p.getID() == packet.playerID)
+							if (p.getID() == packet.getPlayerID())
 								winnerName = p.getName();
 						}
 
 						if (session.setWinner(winnerName)) {
-							packet.winnerName = winnerName;
+							packet.setWinnerName(winnerName);
 							for (Integer connectionID : session.getPlayerIDs()) {
 								server.sendToTCP(connectionID, packet);
 							}
@@ -160,10 +161,10 @@ public class MPServer {
 
 				if (object instanceof IceEffect) {
 					IceEffect packet = (IceEffect) object;
-					if (sessions.get(packet.token) != null) {
-						GameSession session = sessions.get(packet.token);
+					if (sessions.get(packet.getToken()) != null) {
+						GameSession session = sessions.get(packet.getToken());
 						for (Integer connectionID : session.getPlayerIDs()) {
-							if (connectionID != packet.playerID)
+							if (connectionID != packet.getPlayerID())
 								server.sendToTCP(connectionID, packet);
 						}
 					}
@@ -174,7 +175,7 @@ public class MPServer {
 	}
 
 	private boolean isDeleteable(TerminateSession packet) {
-		for (Player player : sessions.get(packet.token).getPlayers())
+		for (Player player : sessions.get(packet.getToken()).getPlayers())
 			if (player.playing)
 				return false;
 		return true;
@@ -182,12 +183,12 @@ public class MPServer {
 
 	private void notifyAllPlayers(GameSession session) {
 		SessionInfo packet = new SessionInfo();
-		packet.playerIDs = session.getPlayerIDs();
-		packet.playerNames = session.getPlayerNames();
-		packet.mapPath = session.getMapPath();
-		packet.token = session.getToken();
+		packet.setPlayerIDs(session.getPlayerIDs());
+		packet.setPlayerNames(session.getPlayerNames());
+		packet.setMapPath(session.getMapPath());
+		packet.setToken(session.getToken());
 		for (Integer connectionID : session.getPlayerIDs()) {
-			packet.playerID = connectionID;
+			packet.setPlayerID(connectionID);
 			server.sendToTCP(connectionID, packet);
 		}
 	}

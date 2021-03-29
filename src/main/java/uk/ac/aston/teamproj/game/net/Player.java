@@ -1,4 +1,4 @@
-package net;
+package uk.ac.aston.teamproj.game.net;
 
 public class Player {
 

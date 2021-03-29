@@ -1,4 +1,4 @@
-package net.packet;
+package uk.ac.aston.teamproj.game.net.packet;
 
 public class GameOver {
 	public boolean gameOver;
