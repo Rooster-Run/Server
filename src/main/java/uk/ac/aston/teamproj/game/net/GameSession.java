@@ -1,4 +1,4 @@
-package net;
+package uk.ac.aston.teamproj.game.net;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ public class GameSession {
 	private String token;
 	private int hostID;
 	private ArrayList<Player> players;
-	private boolean hasStarted = false;
+	private boolean hasStarted;
 	private String mapPath;
 	
 	private String winner;
