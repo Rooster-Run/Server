@@ -12,7 +12,7 @@ plugins {
    id 'application'
 }
 
-application.mainClassName 'net.MPServer'
+application.mainClassName 'uk.ac.aston.teamproj.game.net.MPServer'
 
 repositories {
     // Use jcenter for resolving dependencies.
@@ -23,7 +23,7 @@ repositories {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'net.MPServer'
+                'Main-Class': 'uk.ac.aston.teamproj.game.net.MPServer'
         )
     }
     from {
