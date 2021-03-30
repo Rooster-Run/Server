@@ -59,7 +59,7 @@ public class MPServer {
 				boolean found = false;
 				for (
 						Iterator<Map.Entry<String, GameSession>> iter = sessions.entrySet().iterator();
-						iter.hasNext() || !found;
+						iter.hasNext() && !found;
 				) {
 					Map.Entry<String, GameSession> entry = iter.next();
 					String key = entry.getKey();
